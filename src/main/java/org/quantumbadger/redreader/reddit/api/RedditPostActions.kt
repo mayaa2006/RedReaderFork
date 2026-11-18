@@ -64,6 +64,9 @@ import org.quantumbadger.redreader.reddit.things.SubredditCanonicalId
 import org.quantumbadger.redreader.reddit.url.PostCommentListingURL
 import org.quantumbadger.redreader.reddit.url.SubredditPostListURL
 import org.quantumbadger.redreader.reddit.url.UserProfileURL
+import org.quantumbadger.redreader.steer.Signal
+import org.quantumbadger.redreader.steer.SteerManager
+import org.quantumbadger.redreader.steer.SteerWhyDialog
 import org.quantumbadger.redreader.views.AccessibilityActionManager
 import org.quantumbadger.redreader.views.RedditPostView.PostSelectionListener
 import org.quantumbadger.redreader.views.bezelmenu.SideToolbarOverlay
@@ -109,7 +112,8 @@ object RedditPostActions {
 		UNPIN(R.string.action_unpin_subreddit),
 		SUBSCRIBE(R.string.action_subscribe_subreddit),
 		UNSUBSCRIBE(R.string.action_unsubscribe_subreddit),
-		CROSSPOST_ORIGIN(R.string.action_crosspost_origin)
+		CROSSPOST_ORIGIN(R.string.action_crosspost_origin),
+		STEER_WHY(R.string.steer_action_why)
 
 	}
 
@@ -357,6 +361,7 @@ object RedditPostActions {
 			Action.UNSAVE -> action(post, activity, RedditAPI.ACTION_UNSAVE)
 			Action.HIDE -> action(post, activity, RedditAPI.ACTION_HIDE)
 			Action.UNHIDE -> action(post, activity, RedditAPI.ACTION_UNHIDE)
+			Action.STEER_WHY -> SteerWhyDialog.show(activity, post)
 			Action.MARK_READ -> post.markAsRead(activity, true)
 			Action.MARK_UNREAD -> post.markAsRead(activity, false)
 			Action.EDIT -> {
@@ -925,6 +930,9 @@ object RedditPostActions {
 				)
 			)
 		}
+		// Steer: always offer an explanation of why this post was ranked here
+		menu.add(RPVMenuItem(activity, R.string.steer_action_why, Action.STEER_WHY))
+
 		val menuText = arrayOfNulls<String>(menu.size)
 		for (i in menuText.indices) {
 			menuText[i] = menu[i].title
@@ -1079,6 +1087,15 @@ object RedditPostActions {
 			return
 		}
 		val changeDataManager = RedditChangeDataManager.getInstance(user)
+
+		// Steer: learn from what the user does with posts
+		when (action) {
+			RedditAPI.ACTION_UPVOTE -> Signal.UPVOTED
+			RedditAPI.ACTION_DOWNVOTE -> Signal.DOWNVOTED
+			RedditAPI.ACTION_SAVE -> Signal.SAVED
+			RedditAPI.ACTION_HIDE -> Signal.HIDDEN
+			else -> null
+		}?.let { SteerManager.recordSignal(activity, post.src.src, it) }
 
 		val lastVoteDirection: Int = post.voteDirection
 		val archived: Boolean = post.src.isArchived

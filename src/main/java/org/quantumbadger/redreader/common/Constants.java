@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 
-import org.quantumbadger.redreader.RedReader;
 import org.quantumbadger.redreader.common.collections.CollectionStream;
 import org.quantumbadger.redreader.reddit.things.SubredditCanonicalId;
 
@@ -236,9 +235,8 @@ public final class Constants {
 	}
 
 	public static String ua(final Context context) {
-		final String canonicalName = RedReader.class.getCanonicalName();
-		return canonicalName.substring(0, canonicalName.lastIndexOf('.')) + "/" + version(
-				context);
+		// Steer identifies itself with its own package name rather than RedReader's
+		return context.getPackageName() + "/" + version(context);
 	}
 
 	public static final class Priority {

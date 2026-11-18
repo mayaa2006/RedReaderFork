@@ -99,7 +99,7 @@ public class CacheContentProvider extends ContentProvider {
 
 		return new Uri.Builder()
 				.scheme("content")
-				.authority("org.quantumbadger.redreader.cacheprovider")
+				.authority("io.github.mayaa2006.steer.cacheprovider")
 				.encodedPath(generateFilename(cacheId, mimetype, defaultExtension))
 				.build();
 	}

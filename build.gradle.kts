@@ -78,7 +78,7 @@ android {
 	namespace = "org.quantumbadger.redreader"
 
 	defaultConfig {
-		applicationId = "org.quantumbadger.redreader"
+		applicationId = "io.github.mayaa2006.steer"
 		minSdk = libs.versions.sdk.min.get().toInt()
 		targetSdk = libs.versions.sdk.target.get().toInt()
 		versionCode = 119

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="steer_action_why" translatable="false">Why this post? (Steer)</string>
+	<string name="steer_settings_title" translatable="false">Steer algorithm</string>
+	<string name="steer_show_more" translatable="false">Show more like this</string>
+	<string name="steer_show_less" translatable="false">Show less like this</string>
+	<string name="steer_open_settings" translatable="false">Algorithm settings</string>
+</resources>

@@ -92,6 +92,8 @@ import org.quantumbadger.redreader.reddit.url.PostListingURL;
 import org.quantumbadger.redreader.reddit.url.RedditURLParser;
 import org.quantumbadger.redreader.reddit.url.SearchPostListURL;
 import org.quantumbadger.redreader.reddit.url.SubredditPostListURL;
+import org.quantumbadger.redreader.steer.Signal;
+import org.quantumbadger.redreader.steer.SteerManager;
 import org.quantumbadger.redreader.views.PostListingHeader;
 import org.quantumbadger.redreader.views.RedditPostView;
 import org.quantumbadger.redreader.views.ScrollbarRecyclerViewManager;
@@ -168,8 +170,9 @@ public class PostListingFragment extends RRFragment
 		}
 
 		try {
-			mPostListingURL
-					= (PostListingURL)RedditURLParser.parseProbablePostListing(url);
+			mPostListingURL = SteerManager.adjustListingUrl(
+					parent,
+					(PostListingURL)RedditURLParser.parseProbablePostListing(url));
 		} catch(final ClassCastException e) {
 			Toast.makeText(getActivity(), "Invalid post listing URL.", Toast.LENGTH_LONG)
 					.show();
@@ -525,6 +528,8 @@ public class PostListingFragment extends RRFragment
 	public void onPostSelected(final RedditPreparedPost post) {
 		((RedditPostView.PostSelectionListener)getActivity()).onPostSelected(post);
 
+		SteerManager.recordSignal(getActivity(), post.src.getSrc(), Signal.OPENED);
+
 		new Thread() {
 			@Override
 			public void run() {
@@ -537,6 +542,8 @@ public class PostListingFragment extends RRFragment
 	public void onPostCommentsSelected(final RedditPreparedPost post) {
 
 		((RedditPostView.PostSelectionListener)getActivity()).onPostCommentsSelected(post);
+
+		SteerManager.recordSignal(getActivity(), post.src.getSrc(), Signal.OPENED_COMMENTS);
 
 		new Thread() {
 			@Override
@@ -888,6 +895,8 @@ public class PostListingFragment extends RRFragment
 							final ArrayList<RedditPostListItem> downloadedPosts
 									= new ArrayList<>(25);
 
+							final ArrayList<RedditPost> rawPosts = new ArrayList<>(posts.size());
+
 							for(final MaybeParseError<RedditThing> postThingValue : posts) {
 
 								if(!(postThingValue instanceof MaybeParseError.Ok)) {
@@ -905,7 +914,26 @@ public class PostListingFragment extends RRFragment
 
 								final RedditPost post = ((RedditThing.Post)postThing).getData();
 
+								// Pagination follows Reddit's order, not Steer's
 								mAfter = post.getName();
+								rawPosts.add(post);
+							}
+
+							// Steer: apply mutes and the user's ranking to this page
+							final SteerManager.BatchResult steerResult
+									= SteerManager.processBatch(
+											activity,
+											rawPosts,
+											SteerManager.shouldRank(activity, mPostListingURL),
+											SteerManager.shouldApplyMutes(
+													activity,
+													mPostListingURL));
+
+							if(steerResult.hiddenCount > 0) {
+								mPostsNotShown = true;
+							}
+
+							for(final RedditPost post : steerResult.posts) {
 
 								final boolean isPostBlocked = subredditFilteringEnabled
 										&& blockedSubreddits.contains(

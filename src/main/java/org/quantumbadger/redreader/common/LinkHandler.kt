@@ -437,10 +437,7 @@ object LinkHandler {
 				.queryIntentActivities(baseIntent, 0)) {
 				val packageName = info.activityInfo.packageName
 
-				if (packageName != null && !packageName.startsWith(
-						"org.quantumbadger.redreader"
-					)
-				) {
+				if (packageName != null && packageName != activity.packageName) {
 					val intent = Intent(Intent.ACTION_VIEW)
 					intent.setData(uri)
 					intent.setPackage(packageName)

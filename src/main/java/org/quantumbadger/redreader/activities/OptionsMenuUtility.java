@@ -46,6 +46,7 @@ import org.quantumbadger.redreader.reddit.UserCommentSort;
 import org.quantumbadger.redreader.reddit.api.SubredditSubscriptionState;
 import org.quantumbadger.redreader.settings.SettingsActivity;
 import org.quantumbadger.redreader.settings.types.AppearanceTheme;
+import org.quantumbadger.redreader.steer.SteerSettingsActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -637,6 +638,21 @@ public final class OptionsMenuUtility {
 
 				settings.setShowAsAction(showAsAction);
 				settings.setIcon(R.drawable.ic_settings_dark);
+
+				// Steer: the algorithm screen sits next to Settings
+				final MenuItem steer = menu.add(
+						Menu.NONE,
+						Menu.NONE,
+						Menu.NONE,
+						R.string.steer_settings_title)
+						.setOnMenuItemClickListener(item -> {
+							activity.startActivity(new Intent(
+									activity,
+									SteerSettingsActivity.class));
+							return true;
+						});
+
+				steer.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
 				break;
 			}
