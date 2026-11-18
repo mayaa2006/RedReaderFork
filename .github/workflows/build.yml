@@ -34,26 +34,30 @@ jobs:
                     echo "Installing NDK ${NDK_VERSION}"
                     echo "y" | "$SDKMANAGER" "ndk;$NDK_VERSION" --sdk_root="${ANDROID_SDK_ROOT}"
 
-            -   name: Run release build
-                run: ./gradlew assembleRelease
-
             -   name: Run debug build
-                run: ./gradlew assembleDebug
+                run: bash .github/run-step.sh assembleDebug
 
             -   name: Upload artifact to GitHub
                 uses: actions/upload-artifact@v4
                 with:
-                    name: RedReader-debug.apk
-                    path: build/outputs/apk/debug/RedReader-debug.apk
+                    name: Steer-debug.apk
+                    path: build/outputs/apk/debug/*.apk
 
-            -   name: Run PMD
-                run: ./gradlew pmd
-
-            -   name: Run checkstyle
-                run: ./gradlew checkstyle --stacktrace --info
-
-            -   name: Android Lint
-                run: ./gradlew lint
+            -   name: Run release build
+                run: bash .github/run-step.sh assembleRelease
 
             -   name: Unit tests
-                run: ./gradlew test
+                if: always()
+                run: bash .github/run-step.sh test
+
+            -   name: Run PMD
+                if: always()
+                run: bash .github/run-step.sh pmd
+
+            -   name: Run checkstyle
+                if: always()
+                run: bash .github/run-step.sh checkstyle
+
+            -   name: Android Lint
+                if: always()
+                run: bash .github/run-step.sh lint
