@@ -20,6 +20,7 @@ package org.quantumbadger.redreader.steer
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.core.content.edit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
@@ -103,9 +104,9 @@ object SteerManager {
 		synchronized(lock) {
 			val updated = transform(state.value)
 			state.value = updated
-			prefs?.edit()
-				?.putString(PREFS_KEY_CONFIG, json.encodeToString(SteerConfig.serializer(), updated))
-				?.apply()
+			prefs?.edit {
+				putString(PREFS_KEY_CONFIG, json.encodeToString(SteerConfig.serializer(), updated))
+			}
 		}
 	}
 
