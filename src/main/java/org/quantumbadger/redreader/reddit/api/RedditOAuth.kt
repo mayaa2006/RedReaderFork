@@ -78,6 +78,9 @@ object RedditOAuth {
 	private val appId: String?
 		get() = PrefsUtility.pref_reddit_client_id_override() ?: GlobalConfig.appId
 
+	@JvmStatic
+	fun hasAppId(): Boolean = appId != null
+
 	private val cachedAppId = CachedStringHash { appId ?: "null" }
 
 	fun init(context: Context) {

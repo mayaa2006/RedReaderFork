@@ -5,4 +5,7 @@
 	<string name="steer_show_more" translatable="false">Show more like this</string>
 	<string name="steer_show_less" translatable="false">Show less like this</string>
 	<string name="steer_open_settings" translatable="false">Algorithm settings</string>
+	<string name="steer_no_client_id_title" translatable="false">Reddit client ID needed</string>
+	<string name="steer_no_client_id_message" translatable="false">Steer doesn\'t have a Reddit client ID yet, so Reddit will refuse the login.\n\nGo to Settings → Network → Reddit client ID override, paste your client ID, then fully close and reopen Steer before logging in.</string>
+	<string name="steer_open_settings_button" translatable="false">Open settings</string>
 </resources>

@@ -41,6 +41,7 @@ import org.quantumbadger.redreader.common.LinkHandler;
 import org.quantumbadger.redreader.common.PrefsUtility;
 import org.quantumbadger.redreader.common.TorCommon;
 import org.quantumbadger.redreader.reddit.api.RedditOAuth;
+import org.quantumbadger.redreader.settings.SettingsActivity;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -266,6 +267,22 @@ public class OAuthLoginActivity extends ViewsBaseActivity {
 		PrefsUtility.applyTheme(this);
 
 		super.onCreate(savedInstanceState);
+
+		// Steer: without a client ID Reddit only shows a confusing error page
+		if(!RedditOAuth.hasAppId()) {
+			DialogUtils.showDialogPositiveNegative(
+					this,
+					getString(R.string.steer_no_client_id_title),
+					getString(R.string.steer_no_client_id_message),
+					R.string.steer_open_settings_button,
+					R.string.dialog_cancel,
+					() -> {
+						startActivity(new Intent(this, SettingsActivity.class));
+						finish();
+					},
+					this::finish);
+			return;
+		}
 
 		final WebView webView = createWebView();
 
